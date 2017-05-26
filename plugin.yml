@@ -1,0 +1,14 @@
+name: CustomWhitelist
+main: me.ES359.CustomWhitelist.CustomWhitelist
+version: 1.4
+description: Custom whitelist plugin that allows you to change the whitelist message.
+Authors: ES359
+website: https://github.com/ES359/CustomWhitelist
+
+commands:
+  setmsg:
+    description: Sets the kick message.
+
+  customwhitelist:
+    description: Main command for help.
+    aliases: [cw]

@@ -1,0 +1,4 @@
+# ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+Messages:
+  kick-message: "&9Whitelist&8> &c&oConnection failed: &8&l--&a&l> &cNot Whitelisted, &c&n%playername%"
+  whitelist-alert: "&6&l[&cAlert&6&l] &8&l--&a&l> &6&l&n%playername%, &7(&a%uuid%&7) &cis not Whitelisted!"
