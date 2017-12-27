@@ -1,8 +1,15 @@
 package me.ES359.CustomWhitelist;
 
 import Utilities.*;
+import net.md_5.bungee.api.*;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.*;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
+
+import java.awt.*;
 
 public class CustomWhitelistCommand extends Utils implements CommandExecutor
 {
@@ -13,23 +20,23 @@ public class CustomWhitelistCommand extends Utils implements CommandExecutor
     }
     
     public boolean onCommand( CommandSender sender,  Command cmd,  String commandLabel,  String[] args) {
-        if (cmd.getName().equalsIgnoreCase("customwhitelist") && !sender.hasPermission("Customwhitelist.cmd")) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to use this.. " + "" + ChatColor.GOLD + sender.getName() + ChatColor.RED + ".");
+        if (cmd.getName().equalsIgnoreCase("customwhitelist") && !sender.hasPermission(CWPermissions.COMMAND_GENERAL)) {
+            sender.sendMessage(color(main.getConfig().getString("permission-messages.command")));
         }
         else if (args.length < 1) {
-            sender.sendMessage(ChatColor.GREEN + "Please use more arguments: /customwhitelist help");
+            sender.sendMessage(main.getConfig().getString("permission-messages.argument-error"));
         }
         else if (args.length > 0) {
 
             switch (args[0].toLowerCase()) {
                 case "reload":
                 case "rl": {
-                    if (!sender.hasPermission("Customwhitelist.reload")) {
-                        sender.sendMessage(ChatColor.RED + "Ur nawt admin. c; Talk to Admin for dis!");
+                    if (!sender.hasPermission(CWPermissions.RELOAD)) {
+                        sender.sendMessage(color(main.getConfig().getString("permission-messages.command")));
                         break;
                     }
                     main.reloadConfig();
-                    sender.sendMessage(color("&aThe configuration file has been &6&lreloaded&a, &b&o" + sender.getName()));
+                    sender.sendMessage(color(main.getConfig().getString("permissions.config-reload")));
                     break;
                 }
                 case "help":
@@ -42,8 +49,47 @@ public class CustomWhitelistCommand extends Utils implements CommandExecutor
                     break;
                 }
 
+                case "enforce":
+                    if(!sender.hasPermission(CWPermissions.ENFORCE_USE))
+                    {
+                        sender.sendMessage(color(main.getConfig().getString("permission-messages.command")));
+                    }else
+                    {
+                         for(Player p : Bukkit.getServer().getOnlinePlayers())
+                         { List kickList = new List();
+                             if (!p.isWhitelisted() || !(p.hasPermission(CWPermissions.ENFORCE_BYPASS)))
+                             {
+
+                                 kickList.add(p.getName());
+                                 p.kickPlayer(color(main.getConfig().getString("Messages.enforce-kick")));
+                             }
+
+                             if(p.hasPermission(CWPermissions.NOTIFY))
+                             {
+                                 String fix = main.getConfig().getString("Messages.enforce").replace("{admin}",sender.getName());
+
+                                 TextComponent wlist = new TextComponent("[players]");
+                                 wlist.setColor(ChatColor.GRAY);
+                                 wlist.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("-> " +kickList).create()));
+                                 //fix = fix.replace("{removed_players}",wlist.toString());
+                                 p.sendMessage(color(fix));
+                                 p.spigot().sendMessage(wlist);
+
+                             }
+                         }
+                    }
+                        break;
+
+                case "status":
+                    boolean wl = Bukkit.getServer().hasWhitelist();
+                    int wlAmt = Bukkit.getServer().getWhitelistedPlayers().size();
+                    String value = wl ? color(main.getConfig().getString("Messages.whitelist")): color(main.getConfig().getString("Messages.no-whitelist"));
+                    String result = color(main.getConfig().getString("Messages.status"));
+                    result = result.replace("{whitelist_status}",value);
+                    result = result.replace("{whitelist_count}",""+wlAmt);
+                    sender.sendMessage(result);
                 default: {
-                    sender.sendMessage("ur a scrub. use /customwhitelist help <3 ");
+                    sender.sendMessage(color(main.getConfig().getString("permission-messages.argument-error")));
                     break;
                 }
             }

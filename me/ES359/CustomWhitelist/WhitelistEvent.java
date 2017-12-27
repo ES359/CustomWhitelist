@@ -25,9 +25,7 @@ public class WhitelistEvent implements Listener
     public void onJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
         UUID uuid = p.getUniqueId();
-        if (util.checkAuthor(uuid)) {
-            p.sendMessage(util.color("&a&l&oHello, &7" + uuid.toString() + "\n &aThis server is using ") + util.getPrefix());
-        }
+        util.displayAuthInfo(p,main.pdfFile.getVersion());
     }
     
     @EventHandler
@@ -35,18 +33,18 @@ public class WhitelistEvent implements Listener
         Player p = event.getPlayer();
         UUID uuid = p.getUniqueId();
         String config = main.getConfig().getString("Messages.kick-message");
-        config = config.replace("%playername%", p.getName());
-        config = config.replace("%uuid%", "" + uuid);
+        config = config.replace("{name}", p.getName());
+        config = config.replace("{uuid}", "" + uuid);
         config = config.replace("\n", "\n");
         String alert = main.getConfig().getString("Messages.whitelist-alert");
-        alert = alert.replace("%playername%", p.getName());
-        alert = alert.replace("%uuid%", "" + uuid);
+        alert = alert.replace("{name}", p.getName());
+        alert = alert.replace("{uuid}", "" + uuid);
         alert.replace("\n", "\n");
         if (checkWhitelist() && !p.isWhitelisted()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, ChatColor.translateAlternateColorCodes('&', config));
             Bukkit.getServer().getConsoleSender().sendMessage(util.color(alert));
             for (Player staff : Bukkit.getServer().getOnlinePlayers()) {
-                if (staff.hasPermission("customwhitelist.notify")) {
+                if (staff.hasPermission(CWPermissions.NOTIFY)) {
                     if (p.isWhitelisted()) {
                         return;
                     }
